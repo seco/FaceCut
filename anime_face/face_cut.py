@@ -11,7 +11,7 @@ from tkinter import filedialog, messagebox
 # You must put the file 'lbpcascade_animeface.xml' in the current folder
 class Cutter:
 
-    # initialize
+    # initialize the variables
     def __init__(self):
         self.cascade_path = 'lbpcascade_animeface.xml'
         self.video_paths = list()
@@ -55,17 +55,6 @@ class Cutter:
             if choice == 'yes':
                 sys.exit()
 
-    # change the path to use easily
-    @staticmethod
-    def change(p):
-        path = ''
-        for w in p:
-            if w == '\\':
-                path += '/'
-            else:
-                path += w
-        return path
-
     # cut and return face
     def face_cut(self):
         gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
@@ -79,18 +68,29 @@ class Cutter:
 
     # script of cut face
     def cut(self, filename):
+
+        # change the path to use easily
+        def change(p):
+            result = ''
+            for w in p:
+                if w == '\\':
+                    result += '/'
+                else:
+                    result += w
+            return result
+
         self.cap = cv2.VideoCapture(filename)
         frame_num = 0
         save_num = 1
         path, ext = os.path.splitext(os.path.basename(filename))
         other_num = 0
 
-        output_dir = self.change(os.path.abspath(self.save_path))
+        output_dir = change(os.path.abspath(self.save_path))
         if not os.path.exists(output_dir + '/faces'):
             os.mkdir(output_dir + '/faces')
             output_dir += '/faces'
-        output_dir = self.change(output_dir)
-        other_dir = self.change(os.path.abspath(self.save_path))
+        output_dir = change(output_dir)
+        other_dir = change(os.path.abspath(self.save_path))
         if not os.path.exists(other_dir + '/other'):
             os.mkdir(other_dir + '/other')
             other_dir += '/other'
