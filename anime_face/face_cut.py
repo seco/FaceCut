@@ -90,17 +90,19 @@ class Cutter:
         output_dir = change(os.path.abspath(self.save_path))
         if not os.path.exists(output_dir + '/faces'):
             os.mkdir(output_dir + '/faces')
-            output_dir += '/faces'
+        output_dir += '/faces'
         output_dir = change(output_dir)
         other_dir = change(os.path.abspath(self.save_path))
         if not os.path.exists(other_dir + '/other'):
             os.mkdir(other_dir + '/other')
-            other_dir += '/other'
+        other_dir += '/other'
 
         while self.cap.isOpened():
 
             frame_num += 1
             ret, self.frame = self.cap.read()
+            if not ret:
+                break
             if frame_num % 50 == 0:
                 face = self.face_cut()
                 if len(face) == 0:
@@ -131,6 +133,8 @@ class Cutter:
         self.IsChoice = False
         while not self.IsChoice:
             self.select_save()
+        print(self.video_paths)
+        print(self.save_path)
         for fn in self.video_paths:
             self.cut(fn)
         del self
