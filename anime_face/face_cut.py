@@ -1,3 +1,4 @@
+# import modules
 import cv2
 import os
 import re
@@ -6,8 +7,11 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 
 
+# This class can cut the anime face
+# You must put the file 'lbpcascade_animeface.xml' in the current folder
 class Cutter:
 
+    # initialize
     def __init__(self):
         self.cascade_path = 'lbpcascade_animeface.xml'
         self.video_paths = list()
@@ -16,6 +20,7 @@ class Cutter:
         self.frame = None
         self.cap = None
 
+    # select the Video folder
     def select_make(self):
         self.IsChoice = True
         root = tk.Tk()
@@ -39,6 +44,7 @@ class Cutter:
         if len(self.video_paths) == 0:
             self.IsChoice = False
 
+    # select the Save folder
     def select_save(self):
         root = tk.Tk()
         root.withdraw()
@@ -49,6 +55,7 @@ class Cutter:
             if choice == 'yes':
                 sys.exit()
 
+    # change the path to use easily
     @staticmethod
     def change(p):
         path = ''
@@ -59,6 +66,7 @@ class Cutter:
                 path += w
         return path
 
+    # cut and return face
     def face_cut(self):
         gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
         gray = cv2.equalizeHist(gray)
@@ -69,6 +77,7 @@ class Cutter:
         print(facerect)
         return facerect
 
+    # script of cut face
     def cut(self, filename):
         self.cap = cv2.VideoCapture(filename)
         frame_num = 0
@@ -113,6 +122,7 @@ class Cutter:
 
         self.cap.release()
 
+    # main routine
     def run(self):
         while True:
             self.select_make()
