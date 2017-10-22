@@ -55,6 +55,7 @@ class Cutter:
                                                      '終了しますか？')
             if choice == 'yes':
                 sys.exit()
+        self.IsChoice = True
 
     # cut and return face
     def face_cut(self):
