@@ -111,7 +111,7 @@ class Cutter:
 
                 for j, (x, y, w, h) in enumerate(face):
                     face_img = self.frame[y: y + h, x: x + w]
-                    face_img = cv2.resize(face_img, (50, 50))
+                    face_img = cv2.resize(face_img, (28, 28))
                     output_path = str(output_dir) + '/' + '{0}_{1}_{2}.jpg'.format(path, save_num, j)
                     save_num += 1
                     try:
@@ -124,14 +124,10 @@ class Cutter:
 
     # main routine
     def run(self):
-        while True:
+        while not self.IsChoice:
             self.select_make()
-            if self.IsChoice:
-                break
-        while True:
+        while not self.IsChoice:
             self.select_save()
-            if self.IsChoice:
-                break
         for fn in self.video_paths:
             self.cut(fn)
         del self
