@@ -19,6 +19,7 @@ class Cutter:
         self.IsChoice = None
         self.frame = None
         self.cap = None
+        self.num = 0
 
     # select the Video folder
     def select_make(self):
@@ -80,9 +81,9 @@ class Cutter:
             return result
 
         self.cap = cv2.VideoCapture(filename)
+        self.num += 1
         frame_num = 0
         save_num = 1
-        path, ext = os.path.splitext(os.path.basename(filename))
         other_num = 0
 
         output_dir = change(os.path.abspath(self.save_path))
@@ -102,7 +103,7 @@ class Cutter:
             if frame_num % 50 == 0:
                 face = self.face_cut()
                 if len(face) == 0:
-                    other_path = os.path.join(other_dir, 'd_{0}_{1}.jpg'.format(path, other_num))
+                    other_path = os.path.join(other_dir, 'd_{0}_{1}.jpg'.format(self.num, other_num))
                     other_num += 1
                     try:
                         cv2.imwrite(other_path, self.frame)
@@ -112,7 +113,7 @@ class Cutter:
                 for j, (x, y, w, h) in enumerate(face):
                     face_img = self.frame[y: y + h, x: x + w]
                     face_img = cv2.resize(face_img, (28, 28))
-                    output_path = str(output_dir) + '/' + '{0}_{1}_{2}.jpg'.format(path, save_num, j)
+                    output_path = str(output_dir) + '/' + '{0}_{1}_{2}.jpg'.format(self.num, save_num, j)
                     save_num += 1
                     try:
                         cv2.imwrite(output_path, face_img)
@@ -126,6 +127,7 @@ class Cutter:
     def run(self):
         while not self.IsChoice:
             self.select_make()
+        self.IsChoice = False
         while not self.IsChoice:
             self.select_save()
         for fn in self.video_paths:
