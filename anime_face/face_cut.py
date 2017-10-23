@@ -133,8 +133,6 @@ class Cutter:
         self.IsChoice = False
         while not self.IsChoice:
             self.select_save()
-        print(self.video_paths)
-        print(self.save_path)
         for fn in self.video_paths:
             self.cut(fn)
         del self
