@@ -87,6 +87,7 @@ class Cutter:
         save_num = 1
         other_num = 0
 
+        # if the directory you select has not faces and other directory, make those directory
         output_dir = change(os.path.abspath(self.save_path))
         if not os.path.exists(output_dir + '/faces'):
             os.mkdir(output_dir + '/faces')
@@ -97,6 +98,7 @@ class Cutter:
             os.mkdir(other_dir + '/other')
         other_dir += '/other'
 
+        # cut and save img loop
         while self.cap.isOpened():
 
             frame_num += 1
@@ -105,6 +107,8 @@ class Cutter:
                 break
             if frame_num % 50 == 0:
                 face = self.face_cut()
+
+                # if img has not anime face, save the other directory
                 if len(face) == 0:
                     other_path = os.path.join(other_dir, 'd_{0}_{1}.jpg'.format(self.num, other_num))
                     other_num += 1
@@ -113,6 +117,7 @@ class Cutter:
                     except:
                         messagebox.showerror('Error', '保存に失敗しました')
 
+                # save the img which has the anime face (Size : 28x28)
                 for j, (x, y, w, h) in enumerate(face):
                     face_img = self.frame[y: y + h, x: x + w]
                     face_img = cv2.resize(face_img, (28, 28))
@@ -128,16 +133,20 @@ class Cutter:
 
     # main routine
     def run(self):
+        # select the directory which has video files
         while not self.IsChoice:
             self.select_make()
         self.IsChoice = False
+        # select the save directory
         while not self.IsChoice:
             self.select_save()
+        # cut the anime face
         for fn in self.video_paths:
             self.cut(fn)
         del self
 
 
+# main function
 if __name__ == '__main__':
     cutter = Cutter()
     cutter.run()
