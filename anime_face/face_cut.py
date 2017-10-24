@@ -32,6 +32,9 @@ class Cutter:
             for i, filename in enumerate(os.listdir(dir_path)):
                 fn = str(dir_path + '/' + filename)
                 self.video_paths.append(fn)
+                path, ext = os.path.splitext(filename)
+                if not ext == '.mp4' or not ext == '.avi':
+                    continue
                 paths = [(re.search("[0-9]+", x).group(), x) for x in self.video_paths]
             paths.sort(key=lambda x: int(x[0]))
             for i, p in enumerate(paths):
@@ -57,17 +60,6 @@ class Cutter:
                 sys.exit()
         self.IsChoice = True
 
-    # cut and return face
-    def face_cut(self):
-        gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
-        gray = cv2.equalizeHist(gray)
-
-        cascade = cv2.CascadeClassifier(self.cascade_path)
-        facerect = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, minSize=(50, 50))
-
-        print(facerect)
-        return facerect
-
     # script of cut face
     def cut(self, filename):
 
@@ -80,6 +72,17 @@ class Cutter:
                 else:
                     result += w
             return result
+
+        # cut and return face
+        def face_cut():
+            gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
+            gray = cv2.equalizeHist(gray)
+
+            cascade = cv2.CascadeClassifier(self.cascade_path)
+            facerect = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, minSize=(50, 50))
+
+            print(facerect)
+            return facerect
 
         self.cap = cv2.VideoCapture(filename)
         self.num += 1
@@ -106,7 +109,7 @@ class Cutter:
             if not ret:
                 break
             if frame_num % 50 == 0:
-                face = self.face_cut()
+                face = face_cut()
 
                 # if img has not anime face, save the other directory
                 if len(face) == 0:
@@ -120,7 +123,7 @@ class Cutter:
                 # save the img which has the anime face (Size : 28x28)
                 for j, (x, y, w, h) in enumerate(face):
                     face_img = self.frame[y: y + h, x: x + w]
-                    face_img = cv2.resize(face_img, (28, 28))
+                    # face_img = cv2.resize(face_img, (28, 28))
                     output_path = str(output_dir) + '/' + '{0}_{1}_{2}.jpg'.format(self.num, save_num, j)
                     save_num += 1
                     try:
