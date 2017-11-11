@@ -5,6 +5,7 @@ import re
 import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox
+from joblib import Parallel, delayed
 
 
 # This class can cut the anime face
@@ -95,7 +96,7 @@ class Cutter:
         if not os.path.exists(output_dir + '/faces'):
             os.mkdir(output_dir + '/faces')
         output_dir += '/faces'
-        output_dir = change(output_dir)
+
         other_dir = change(os.path.abspath(self.save_path))
         if not os.path.exists(other_dir + '/other'):
             os.mkdir(other_dir + '/other')
@@ -134,8 +135,8 @@ class Cutter:
 
         self.cap.release()
 
-    # main routine
-    def run(self):
+    # select the video directory and save directory
+    def select(self):
         # select the directory which has video files
         while not self.IsChoice:
             self.select_make()
@@ -143,13 +144,18 @@ class Cutter:
         # select the save directory
         while not self.IsChoice:
             self.select_save()
+
+    # main routine
+    def run(self):
         # cut the anime face
-        for fn in self.video_paths:
-            self.cut(fn)
-        del self
+        for path in self.video_paths:
+            self.cut(path)
+        Parallel(n_jobs=-1)([delayed(self.cut(filename) for filename in self.video_paths)])
 
 
 # main function
 if __name__ == '__main__':
     cutter = Cutter()
+    cutter.select()
     cutter.run()
+
