@@ -23,7 +23,7 @@ class Cutter:
         self.num = 0
 
     # select the Video folder
-    def select_make(self):
+    def __select_make(self):
         self.IsChoice = True
         root = tk.Tk()
         root.withdraw()
@@ -50,7 +50,7 @@ class Cutter:
             self.IsChoice = False
 
     # select the Save folder
-    def select_save(self):
+    def __select_save(self):
         root = tk.Tk()
         root.withdraw()
         self.save_path = filedialog.askdirectory(initialdir='C:/', title='保存フォルダを選択してください')
@@ -62,7 +62,7 @@ class Cutter:
         self.IsChoice = True
 
     # script of cut face
-    def cut(self, filename):
+    def __cut(self, filename):
 
         # change the path to use easily
         def change(p):
@@ -136,26 +136,26 @@ class Cutter:
         self.cap.release()
 
     # select the video directory and save directory
-    def select(self):
+    def __select(self):
         # select the directory which has video files
         while not self.IsChoice:
-            self.select_make()
+            self.__select_make()
         self.IsChoice = False
         # select the save directory
         while not self.IsChoice:
-            self.select_save()
+            self.__select_save()
 
     # main routine
     def run(self):
+        self.__select()
         # cut the anime face
         for path in self.video_paths:
-            self.cut(path)
-        Parallel(n_jobs=-1)([delayed(self.cut(filename) for filename in self.video_paths)])
+            self.__cut(path)
+        Parallel(n_jobs=-1)([delayed(self.__cut(filename) for filename in self.video_paths)])
 
 
 # main function
 if __name__ == '__main__':
     cutter = Cutter()
-    cutter.select()
     cutter.run()
 
