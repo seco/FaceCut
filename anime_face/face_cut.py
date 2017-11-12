@@ -5,7 +5,8 @@ import re
 import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from joblib import Parallel, delayed
+from concurrent.futures import ThreadPoolExecutor as tpe
+import joblib
 
 
 # This class can cut the anime face
@@ -20,7 +21,6 @@ class Cutter:
         self.IsChoice = None
         self.frame = None
         self.cap = None
-        self.num = 0
 
     # select the Video folder
     def __select_make(self):
@@ -62,7 +62,7 @@ class Cutter:
         self.IsChoice = True
 
     # script of cut face
-    def __cut(self, filename):
+    def cut(self, filename):
 
         # change the path to use easily
         def change(p):
@@ -86,8 +86,8 @@ class Cutter:
             return facerect
 
         self.cap = cv2.VideoCapture(filename)
-        self.num += 1
         frame_num = 0
+        storyNum = 0
         save_num = 1
         other_num = 0
 
@@ -114,7 +114,7 @@ class Cutter:
 
                 # if img has not anime face, save the other directory
                 if len(face) == 0:
-                    other_path = os.path.join(other_dir, 'd_{0}_{1}.jpg'.format(self.num, other_num))
+                    other_path = os.path.join(other_dir, 'd_{0}_{1}.jpg'.format(storyNum, other_num))
                     other_num += 1
                     try:
                         cv2.imwrite(other_path, self.frame)
@@ -125,7 +125,7 @@ class Cutter:
                 for j, (x, y, w, h) in enumerate(face):
                     face_img = self.frame[y: y + h, x: x + w]
                     # face_img = cv2.resize(face_img, (28, 28))
-                    output_path = str(output_dir) + '/' + '{0}_{1}_{2}.jpg'.format(self.num, save_num, j)
+                    output_path = str(output_dir) + '/' + '{0}_{1}.jpg'.format(storyNum, save_num)
                     save_num += 1
                     try:
                         cv2.imwrite(output_path, face_img)
@@ -148,11 +148,8 @@ class Cutter:
     # main routine
     def run(self):
         self.__select()
-        # cut the anime face
-        for path in self.video_paths:
-            self.__cut(path)
-        Parallel(n_jobs=-1)([delayed(self.__cut(filename) for filename in self.video_paths)])
 
+        joblib.Parallel(n_jobs=-1)(joblib.delayed(self.cut)(path) for path in self.video_paths)
 
 # main function
 if __name__ == '__main__':
