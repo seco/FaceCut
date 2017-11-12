@@ -3,10 +3,10 @@ import cv2
 import os
 import re
 import sys
+import joblib
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from concurrent.futures import ThreadPoolExecutor as tpe
-import joblib
+import time
 
 
 # This class can cut the anime face
@@ -86,8 +86,8 @@ class Cutter:
             return facerect
 
         self.cap = cv2.VideoCapture(filename)
+        storyNum, ext = os.path.splitext(os.path.basename(filename))
         frame_num = 0
-        storyNum = 0
         save_num = 1
         other_num = 0
 
@@ -148,8 +148,12 @@ class Cutter:
     # main routine
     def run(self):
         self.__select()
-
+        start = time.time()
+        #for path in self.video_paths:
+        #    self.cut(path)
         joblib.Parallel(n_jobs=-1)(joblib.delayed(self.cut)(path) for path in self.video_paths)
+        end = time.time() - start
+        messagebox.showinfo('time', str(end))
 
 # main function
 if __name__ == '__main__':
