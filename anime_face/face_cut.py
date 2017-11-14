@@ -151,6 +151,7 @@ class Cutter:
         start = time.time()
         joblib.Parallel(n_jobs=-1)(joblib.delayed(self.cut)(path) for path in self.video_paths)
         end = time.time() - start
+        print("\n\n\n{}", end)
         messagebox.showinfo('time', str(end))
 
 
