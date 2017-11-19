@@ -149,11 +149,10 @@ class Cutter:
     def run(self):
         self.__select()
         start = time.time()
-        #for path in self.video_paths:
-        #    self.cut(path)
         joblib.Parallel(n_jobs=-1)(joblib.delayed(self.cut)(path) for path in self.video_paths)
         end = time.time() - start
         messagebox.showinfo('time', str(end))
+
 
 # main function
 if __name__ == '__main__':
