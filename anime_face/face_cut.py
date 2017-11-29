@@ -159,4 +159,3 @@ class Cutter:
 if __name__ == '__main__':
     cutter = Cutter()
     cutter.run()
-
