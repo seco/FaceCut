@@ -9,6 +9,29 @@ from PIL import Image
 import os
 
 
+def set_image():
+    image_list = list()
+    label_list = list()
+    for dir in os.listdir('data/train'):
+        dir1 = "data/train/" + dir
+        label = 0
+
+        if dir == 'spam':
+            label = 0
+        elif dir == 'ham':
+            label = 1
+        elif dir == 'egg':
+            label = 2
+
+        for file in os.listdir(dir1):
+            label_list.append(label)
+            filepath = dir1 + '/' + file
+            image = np.array(Image.open(filepath).resize(100, 100))
+            print(filepath)
+
+
+
+
 class Model:
     def __init__(self, image_list, label_list):
         self.model = Sequential()
@@ -17,11 +40,11 @@ class Model:
         self.Y = to_categorical(label_list)
 
     def add(self):
-        self.model.add(Convolution2D(32, 3, 3, border_mode='same', input_shape=(3, 100, 100)))
+        self.model.add(Convolution2D(32, 3, 3, padding='same', input_shape=(3, 100, 100)))
         self.model.add(Activation('relu'))
         self.model.add(Convolution2D(32, 3, 3))
         self.model.add(Activation('relu'))
-        self.model.add(MaxPooling2D(pool_size=(2, 2), border_mode='same'))
+        self.model.add(MaxPooling2D(pool_size=(2, 2), padding='same'))
         self.model.add(Dropout(0.25))
 
         self.model.add(Flatten())
