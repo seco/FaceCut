@@ -1,6 +1,6 @@
 from keras.models import Sequential
 from keras.layers import Activation, Dense, Dropout
-from keras.layers import Convolution2D, Flatten, MaxPooling2D
+from keras.layers import Conv2D, Flatten, MaxPooling2D
 from keras.utils.np_utils import to_categorical
 from keras.optimizers import Adam
 import numpy as np
@@ -17,9 +17,9 @@ class Model:
         self.label_list = list()
 
     def _add(self):
-        self.model.add(Convolution2D(32, (3, 3), padding='same', input_shape=(100, 100, 3)))
+        self.model.add(Conv2D(32, (3, 3), padding='same', input_shape=(100, 100, 3)))
         self.model.add(Activation('relu'))
-        self.model.add(Convolution2D(32, 3, 3))
+        self.model.add(Conv2D(32, (3, 3)))
         self.model.add(Activation('relu'))
         self.model.add(MaxPooling2D(pool_size=(2, 2), padding='same'))
         self.model.add(Dropout(0.25))
@@ -41,7 +41,7 @@ class Model:
         self.image_list, self.label_list = self.set_image()
         self._add()
         self._compile()
-        self.model.fit(self.image_list, self.Y, nb_epoch=1000, batch_size=25, validation_split=0.1)
+        self.model.fit(self.image_list, self.Y, epochs=1000, batch_size=25, validation_split=0.1)
 
     @staticmethod
     def set_image():
