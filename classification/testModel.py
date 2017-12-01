@@ -17,20 +17,27 @@ class Model:
         self.label_list = list()
 
     def _add(self):
-        self.model.add(Conv2D(32, (3, 3), padding='same', input_shape=(100, 100, 3)))
+        self.model.add(Conv2D(64, (3, 3), padding='same', input_shape=(160, 160, 3)))
         self.model.add(Activation('relu'))
-        self.model.add(Conv2D(32, (3, 3)))
+        self.model.add(Conv2D(64, (3, 3)))
         self.model.add(Activation('relu'))
-        self.model.add(MaxPooling2D(pool_size=(2, 2), padding='same'))
-        self.model.add(Dropout(0.25))
+        self.model.add(MaxPooling2D(pool_size=(2, 2)))
+
+        self.model.add(Conv2D(128, (3, 3)))
+        self.model.add(Activation('relu'))
+        self.model.add(MaxPooling2D(pool_size=(2, 2)))
+
+        self.model.add(Conv2D(128, (3, 3)))
+        self.model.add(Activation('relu'))
+        self.model.add(MaxPooling2D(2, 2))
 
         self.model.add(Flatten())
 
-        self.model.add(Dense(200))
+        self.model.add(Dense(64))
         self.model.add(Activation('relu'))
-        self.model.add(Dropout(0.2))
+        self.model.add(Dropout(0.5))
 
-        self.model.add(Dense(4))
+        self.model.add(Dense(4, kernel_initializer='uniform'))
         self.model.add(Activation('softmax'))
 
     def _compile(self):
@@ -63,7 +70,7 @@ class Model:
             for file in os.listdir(dir1):
                 label_list.append(label)
                 filepath = dir1 + '/' + file
-                image = np.array(Image.open(filepath).resize((100, 100)))
+                image = np.array(Image.open(filepath).resize((160, 160)))
                 print(filepath)
                 image_list.append(image / 255.)
 
@@ -88,7 +95,7 @@ class Model:
 
             for file in os.listdir(dir1):
                 filepath = dir1 + '/' + file
-                image = np.array(Image.open(filepath).resize(100, 100))
+                image = np.array(Image.open(filepath).resize(160, 160))
                 print(filepath)
                 result = self.model.predict_classes(np.array([image / 255.]))
                 print('label:', label, 'result:', result[0])
