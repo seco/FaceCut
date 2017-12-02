@@ -2,6 +2,7 @@ from keras.models import Sequential
 from keras.layers import Activation, Dense, Dropout
 from keras.layers import Conv2D, Flatten, MaxPooling2D
 from keras.utils.np_utils import to_categorical
+from keras.callbacks import TensorBoard
 from keras.optimizers import Adam
 import numpy as np
 from PIL import Image
@@ -46,9 +47,11 @@ class Model:
 
     def _learn(self):
         self.image_list, self.label_list = self.set_image()
+        tbcb = TensorBoard(log_dir='log', histogram_freq=1, write_graph=True, write_images=True)
         self._add()
         self._compile()
-        self.model.fit(self.image_list, self.Y, epochs=1000, batch_size=25, validation_split=0.1)
+        self.model.fit(self.image_list, self.Y, epochs=1000, batch_size=25, validation_split=0.1, callbacks=[tbcb])
+        self.model.save('model')
 
     @staticmethod
     def set_image():
