@@ -3,7 +3,7 @@ from keras.layers import Activation, Dense, Dropout
 from keras.layers import Conv2D, Flatten, MaxPooling2D
 from keras.utils.np_utils import to_categorical
 from keras.callbacks import TensorBoard
-from keras.optimizers import Adam
+from keras.optimizers import Adam, Adagrad
 import numpy as np
 from PIL import Image
 import os
