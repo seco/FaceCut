@@ -18,6 +18,7 @@ class Model:
         self.label_list = list()
 
     def _add(self):
+        print('create the model')
         self.model.add(Conv2D(64, (3, 3), padding='same', input_shape=(160, 160, 3)))
         self.model.add(Activation('relu'))
         self.model.add(Conv2D(64, (3, 3)))
@@ -30,7 +31,7 @@ class Model:
 
         self.model.add(Conv2D(128, (3, 3)))
         self.model.add(Activation('relu'))
-        self.model.add(MaxPooling2D(2, 2))
+        self.model.add(MaxPooling2D(pool_size=(2, 2)))
 
         self.model.add(Flatten())
 
@@ -47,11 +48,12 @@ class Model:
 
     def _learn(self):
         self.image_list, self.label_list = self.set_image()
-        tbcb = TensorBoard(log_dir='log', histogram_freq=1, write_graph=True, write_images=True)
+        tbcb = TensorBoard(log_dir='logs', histogram_freq=1, write_graph=True, write_images=True)
         self._add()
         self._compile()
+        print('Start learn')
         self.model.fit(self.image_list, self.Y, epochs=1000, batch_size=25, validation_split=0.1, callbacks=[tbcb])
-        self.model.save('model')
+        self.model.save('models')
 
     @staticmethod
     def set_image():
@@ -98,9 +100,9 @@ class Model:
 
             for file in os.listdir(dir1):
                 filepath = dir1 + '/' + file
-                image = np.array(Image.open(filepath).resize(160, 160))
+                image = np.array(Image.open(filepath).resize(160, 160)).astype('float32')
                 print(filepath)
-                result = self.model.predict_classes(np.array([image / 255.])).astype('float32')
+                result = self.model.predict_classes(np.array([image / 255.]))
                 print('label:', label, 'result:', result[0])
 
                 total += 1
