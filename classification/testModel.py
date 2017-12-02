@@ -70,7 +70,7 @@ class Model:
             for file in os.listdir(dir1):
                 label_list.append(label)
                 filepath = dir1 + '/' + file
-                image = np.array(Image.open(filepath).resize((160, 160))).astype('float32')
+                image = np.array(Image.open(filepath).resize((160, 160))).astype("float32")
                 print(filepath)
                 image_list.append(image / 255.)
 
@@ -95,9 +95,9 @@ class Model:
 
             for file in os.listdir(dir1):
                 filepath = dir1 + '/' + file
-                image = np.array(Image.open(filepath).resize(160, 160)).astype('float32')
+                image = np.array(Image.open(filepath).resize(160, 160))
                 print(filepath)
-                result = self.model.predict_classes(np.array([image / 255.]))
+                result = self.model.predict_classes(np.array([image / 255.])).astype('float32')
                 print('label:', label, 'result:', result[0])
 
                 total += 1
