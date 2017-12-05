@@ -75,7 +75,7 @@ print('Start Learn')
 history = model.fit_generator(
     train_generator,
     steps_per_epoch=90,
-    epochs=10,
+    epochs=5,
     validation_data=test_generator,
     validation_steps=90,
     callbacks=[cpcb]
@@ -117,6 +117,7 @@ for dir in os.listdir('data/test'):
             im = Image.open(filepath)
             im.show()
             messagebox.showinfo('結果', 'この画像は' + charName + 'です')
+            im.close()
             ok_total += 1
 
 print('Answer : ', ok_total / total * 100, '%')
