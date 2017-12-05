@@ -84,7 +84,7 @@ for dir in os.listdir('data/test'):
 
     for file in os.listdir(dir1):
         filepath = dir1 + '/' + file
-        image = np.array(Image.open(filepath).resize(160, 160)).astype('float32')
+        image = np.array(Image.open(filepath).resize((160, 160))).astype('float32')
         print(filepath)
         result = model.predict_classes(np.array([image / 255.]))
         print('label', label, 'result:', result[0])

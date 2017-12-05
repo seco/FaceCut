@@ -8,37 +8,38 @@ from keras.preprocessing.image import ImageDataGenerator
 import numpy as np
 from PIL import Image
 import os
+from tkinter import messagebox
 
 batch_size = 25
 epochs = 50
 
 train_datagen = ImageDataGenerator(
-	rescale=1.0 / 255,
-	shear_range=0.2,
-	zoom_range=0.2,
-	horizontal_flip=True
+    rescale=1.0 / 255,
+    shear_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=True
 )
 
 test_datagen = ImageDataGenerator(rescale=1.0 / 255)
 
 train_generator = train_datagen.flow_from_directory(
-	'data/train',
-	target_size=(160, 160),
-	batch_size=batch_size,
-	class_mode='categorical'
+    'data/train',
+    target_size=(160, 160),
+    batch_size=batch_size,
+    class_mode='categorical'
 )
 
 test_generator = test_datagen.flow_from_directory(
-	'data/test',
-	target_size=(160, 160),
-	batch_size=batch_size,
-	class_mode='categorical'
+    'data/test',
+    target_size=(160, 160),
+    batch_size=batch_size,
+    class_mode='categorical'
 )
 
 callbacks = list()
 opt = Adam()
-fpath = 'weights.{epoch:02d}-{loss:.2f}-{acc:.2f}-{val_loss:.2f}-{val_acc:.2f}.hdf5'
-tbcb = TensorBoard(log_dir='logs', histogram_freq=1, write_graph=True, write_images=True)
+fpath = 'models/weights.{epoch:02d}-{loss:.2f}-{acc:.2f}-{val_loss:.2f}-{val_acc:.2f}.hdf5'
+tbcb = TensorBoard(log_dir='logs', histogram_freq=1)
 cpcb = ModelCheckpoint(filepath=fpath, monitor='val_loss', verbose=1, save_best_only=True, mode='auto')
 callbacks.append(tbcb)
 callbacks.append(cpcb)
@@ -72,38 +73,50 @@ model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy
 print('Start Learn')
 
 history = model.fit_generator(
-	train_generator,
-	samples_per_epoch=90,
-	epochs=50,
-	validation_data=test_generator,
-	callback=callbacks
+    train_generator,
+    steps_per_epoch=90,
+    epochs=10,
+    validation_data=test_generator,
+    validation_steps=90,
+    callbacks=[cpcb]
 )
 
 total = 0
 ok_total = 0
+charName = ''
 for dir in os.listdir('data/test'):
-	dir1 = 'data/test/' + dir
-	label = 0
+    dir1 = 'data/test/' + dir
+    label = 0
 
-	if dir == 'gavriel':
-		label = 0
-	elif dir == 'raphiel':
-		label = 1
-	elif dir == 'satanichia':
-		label = 2
-	elif dir == 'vigne':
-		label = 3
+    if dir == 'gavriel':
+        label = 0
+        charName = 'gavriel'
 
-	for file in os.listdir(dir1):
-    filepath = dir1 + '/' + file
-		image = np.array(Image.open(filepath).resize(160, 160)).astype('float32')
-		print(filepath)
-		result = model.predict_classes(np.array([image / 255.]))
-		print('label', label, 'result:', result[0])
+    elif dir == 'raphiel':
+        label = 1
+        charName = 'raphiel'
 
-		total += 1
+    elif dir == 'satanichia':
+        label = 2
+        charName = 'satanichia'
 
-		if label == result[0]:
-			ok_total += 1
+    elif dir == 'vigne':
+        label = 3
+        charName = 'vigne'
+
+    for file in os.listdir(dir1):
+        filepath = dir1 + '/' + file
+        image = np.array(Image.open(filepath).resize((160, 160))).astype('float32')
+        print(filepath)
+        result = model.predict_classes(np.array([image / 255.]))
+        print('label', label, 'result:', result[0])
+
+        total += 1
+
+        if label == result[0]:
+            im = Image.open(filepath)
+            im.show()
+            messagebox.showinfo('結果', 'この画像は' + charName + 'です')
+            ok_total += 1
 
 print('Answer : ', ok_total / total * 100, '%')
