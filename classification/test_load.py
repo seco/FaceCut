@@ -7,7 +7,7 @@ import tkinter as tk
 root = tk.Tk()
 root.withdraw()
 
-model = load_model('models/weights.07-0.03-0.99-0.00-1.00.hdf5')
+model = load_model('master/model1.hdf5')
 
 total = 0
 ok_total = 0
@@ -40,8 +40,6 @@ for dir in os.listdir('data/test'):
         if label == result[0]:
             ok_total += 1
             print('正解')
-            img = Image.open(filepath)
-            img.show()
         else:
             print(filepath)
             img = Image.open(filepath)

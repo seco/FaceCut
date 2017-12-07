@@ -11,8 +11,8 @@ import os
 image_list = list()
 label_list = list()
 
-for dir in os.listdir('data/train'):
-    dir1 = 'data/train/' + dir
+for dir in os.listdir('data/validation'):
+    dir1 = 'data/validation/' + dir
     label = 0
 
     if dir == 'gavriel':

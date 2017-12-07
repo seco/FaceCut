@@ -29,8 +29,8 @@ train_generator = train_datagen.flow_from_directory(
     class_mode='categorical'
 )
 
-test_generator = test_datagen.flow_from_directory(
-    'data/test',
+validation_generator = test_datagen.flow_from_directory(
+    'data/validation',
     target_size=(160, 160),
     batch_size=batch_size,
     class_mode='categorical'
@@ -76,7 +76,7 @@ history = model.fit_generator(
     train_generator,
     steps_per_epoch=90,
     epochs=5,
-    validation_data=test_generator,
+    validation_data=validation_generator,
     validation_steps=90,
     callbacks=[cpcb]
 )
@@ -114,10 +114,11 @@ for dir in os.listdir('data/test'):
         total += 1
 
         if label == result[0]:
+            ok_total += 1
+        else:
             im = Image.open(filepath)
             im.show()
             messagebox.showinfo('結果', 'この画像は' + charName + 'です')
             im.close()
-            ok_total += 1
 
 print('Answer : ', ok_total / total * 100, '%')
