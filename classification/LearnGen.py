@@ -41,7 +41,7 @@ opt = Adam()
 fpath = 'models/weights.{epoch:02d}-{loss:.2f}-{acc:.2f}-{val_loss:.2f}-{val_acc:.2f}.hdf5'
 tbcb = TensorBoard(log_dir='logs', histogram_freq=1)
 cpcb = ModelCheckpoint(filepath=fpath, monitor='val_loss', verbose=1, save_best_only=True, mode='auto')
-callbacks.append(tbcb)
+#callbacks.append(tbcb)
 callbacks.append(cpcb)
 
 print('Make Model')
@@ -78,7 +78,7 @@ history = model.fit_generator(
     epochs=5,
     validation_data=validation_generator,
     validation_steps=90,
-    callbacks=[cpcb]
+    callbacks=callbacks
 )
 
 total = 0
@@ -115,10 +115,9 @@ for dir in os.listdir('data/test'):
 
         if label == result[0]:
             ok_total += 1
+            print('正解')
         else:
-            im = Image.open(filepath)
-            im.show()
-            messagebox.showinfo('結果', 'この画像は' + charName + 'です')
-            im.close()
+            print(filepath)
+            print('不正解')
 
 print('Answer : ', ok_total / total * 100, '%')
