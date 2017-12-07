@@ -1,11 +1,10 @@
 from keras.models import Sequential
 from keras.layers.core import Flatten, Dense, Dropout
 from keras.layers.convolutional import Conv2D, MaxPooling2D, ZeroPadding2D
-from keras.optimizers import SGD
-import cv2, numpy as np
+from keras.optimizers import Adam
 
 
-def makeVGG16(weights_path = None):
+def makeVGG16(weights_path=None):
     model = Sequential()
 
     model.add(ZeroPadding2D((1, 1), input_shape=(224, 224, 3)))
@@ -46,7 +45,7 @@ def makeVGG16(weights_path = None):
     if weights_path:
         model.load_weights(weights_path)
 
-    sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
-    model.compile(optimizer=sgd, loss='crossentropy')
+    adam = Adam()
+    model.compile(optimizer=adam, loss='categorical_crossentropy', metrics=['accuracy'])
 
     return model
