@@ -8,7 +8,6 @@ from keras.preprocessing.image import ImageDataGenerator
 import numpy as np
 from PIL import Image
 import os
-from tkinter import messagebox
 
 batch_size = 25
 epochs = 50
@@ -66,7 +65,7 @@ model.add(Dense(64))
 model.add(Activation('relu'))
 model.add(Dropout(0.5))
 
-model.add(Dense(4, kernel_initializer='uniform'))
+model.add(Dense(11, kernel_initializer='uniform'))
 model.add(Activation('softmax'))
 
 model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
@@ -88,21 +87,30 @@ for dir in os.listdir('data/test'):
     dir1 = 'data/test/' + dir
     label = 0
 
-    if dir == 'gavriel':
+    if dir == 'dagashiya':
         label = 0
-        charName = 'gavriel'
-
-    elif dir == 'raphiel':
+    elif dir == 'gabriel':
         label = 1
-        charName = 'raphiel'
-
-    elif dir == 'satanichia':
+    elif dir == 'hikanee':
         label = 2
-        charName = 'satanichia'
-
-    elif dir == 'vigne':
+    elif dir == 'hotaru':
         label = 3
-        charName = 'vigne'
+    elif dir == 'komari':
+        label = 4
+    elif dir == 'konomi':
+        label = 5
+    elif dir == 'konomi':
+        label = 6
+    elif dir == 'nattsun':
+        label = 7
+    elif dir == 'raphiel':
+        label = 8
+    elif dir == 'renge':
+        label = 9
+    elif dir == 'satanichia':
+        label = 10
+    elif dir == 'vigne':
+        label = 11
 
     for file in os.listdir(dir1):
         filepath = dir1 + '/' + file
