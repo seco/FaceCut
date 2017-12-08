@@ -9,7 +9,7 @@ import numpy as np
 from PIL import Image
 import os
 
-batch_size = 25
+batch_size = 32
 epochs = 50
 
 train_datagen = ImageDataGenerator(
@@ -45,17 +45,19 @@ callbacks.append(cpcb)
 
 print('Make Model')
 model = Sequential()
-model.add(Conv2D(64, (3, 3), padding='same', input_shape=(160, 160, 3)))
+
+model.add(Conv2D(96, (3, 3), padding='same', input_shape=(160, 160, 3)))
 model.add(Activation('relu'))
-model.add(Conv2D(64, (3, 3)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Conv2D(128, (3, 3)))
 model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Conv2D(128, (3, 3)))
+model.add(Conv2D(256, (3, 3)))
+model.add(Activation('relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+model.add(Conv2D(512, (3, 3)))
 model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
@@ -74,7 +76,7 @@ print('Start Learn')
 history = model.fit_generator(
     train_generator,
     steps_per_epoch=90,
-    epochs=5,
+    epochs=10,
     validation_data=validation_generator,
     validation_steps=90,
     callbacks=callbacks
@@ -99,18 +101,16 @@ for dir in os.listdir('data/test'):
         label = 4
     elif dir == 'konomi':
         label = 5
-    elif dir == 'konomi':
-        label = 6
     elif dir == 'nattsun':
-        label = 7
+        label = 6
     elif dir == 'raphiel':
-        label = 8
+        label = 7
     elif dir == 'renge':
-        label = 9
+        label = 8
     elif dir == 'satanichia':
-        label = 10
+        label = 9
     elif dir == 'vigne':
-        label = 11
+        label = 10
 
     for file in os.listdir(dir1):
         filepath = dir1 + '/' + file
