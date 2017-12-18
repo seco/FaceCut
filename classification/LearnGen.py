@@ -1,15 +1,16 @@
 from keras.models import Sequential
 from keras.layers import Activation, Dense, Dropout, Conv2D
 from keras.layers import Flatten, MaxPooling2D
-from keras.optimizers import Adam
+from keras.optimizers import Adam, Nadam
 from keras.callbacks import TensorBoard
 from keras.callbacks import ModelCheckpoint
+from keras.layers import BatchNormalization
 from keras.preprocessing.image import ImageDataGenerator
 import numpy as np
 from PIL import Image
 import os
 
-batch_size = 32
+batch_size = 25
 epochs = 50
 
 train_datagen = ImageDataGenerator(
@@ -39,25 +40,28 @@ callbacks = list()
 opt = Adam()
 fpath = 'models/weights.{epoch:02d}-{loss:.2f}-{acc:.2f}-{val_loss:.2f}-{val_acc:.2f}.hdf5'
 tbcb = TensorBoard(log_dir='logs', histogram_freq=1)
-cpcb = ModelCheckpoint(filepath=fpath, monitor='val_loss', verbose=1, save_best_only=True, mode='auto')
+cpcb = ModelCheckpoint(filepath=fpath, monitor='val_loss', verbose=0, save_best_only=True, mode='auto')
 #callbacks.append(tbcb)
 callbacks.append(cpcb)
 
 print('Make Model')
 model = Sequential()
 
-model.add(Conv2D(96, (3, 3), padding='same', input_shape=(160, 160, 3)))
+model.add(Conv2D(64, (3, 3), padding='same', input_shape=(160, 160, 3)))
 model.add(Activation('relu'))
+model.add(Conv2D(64, (3, 3)))
+model.add(Activation('relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Conv2D(128, (3, 3)))
 model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Conv2D(256, (3, 3)))
+model.add(Conv2D(128, (3, 3)))
 model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Conv2D(512, (3, 3)))
+model.add(Conv2D(128, (3, 3)))
 model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
@@ -75,10 +79,10 @@ print('Start Learn')
 
 history = model.fit_generator(
     train_generator,
-    steps_per_epoch=90,
-    epochs=10,
+    steps_per_epoch=6924,
+    epochs=1000,
     validation_data=validation_generator,
-    validation_steps=90,
+    validation_steps=6924,
     callbacks=callbacks
 )
 
