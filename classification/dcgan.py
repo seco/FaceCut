@@ -16,48 +16,53 @@ import math
 class dcgan:
 
     def __init__(self):
-        self.discriminator = Sequential()
-        self.generator = Sequential()
+        self.discriminator = None
+        self.generator = None
         self.dcgan = None
         self.image_list = list()
 
-    def make_discriminator(self):
+    def __makeDiscriminator(self):
         print('create discriminator')
-        self.discriminator.add(Conv2D(64, (3, 3), padding='same', strides=(2, 2), input_shape=[160, 160, 3]))
-        self.discriminator.add(LeakyReLU())
-        self.discriminator.add(Conv2D(128, (3, 3), padding='same', strides=(2, 2)))
-        self.discriminator.add(BatchNormalization())
-        self.discriminator.add(LeakyReLU())
-        self.discriminator.add(Conv2D(256, (3, 3), padding='same', strides=(2, 2)))
-        self.discriminator.add(BatchNormalization())
-        self.discriminator.add(LeakyReLU())
-        self.discriminator.add(Flatten())
-        self.discriminator.add(Dense(2048))
-        self.discriminator.add(BatchNormalization())
-        self.discriminator.add(LeakyReLU())
-        self.discriminator.add(Dense(1, activation='sigmoid'))
+        model = Sequential()
+        model.add(Conv2D(64, (3, 3), padding='same', strides=(2, 2), input_shape=(64, 64, 3)))
+        model.add(LeakyReLU())
+        model.add(Conv2D(128, (3, 3), padding='same', strides=(2, 2)))
+        model.add(BatchNormalization())
+        model.add(LeakyReLU())
+        model.add(Conv2D(256, (3, 3), padding='same', strides=(2, 2)))
+        model.add(BatchNormalization())
+        model.add(LeakyReLU())
+        model.add(Flatten())
+        model.add(Dense(2048))
+        model.add(BatchNormalization())
+        model.add(LeakyReLU())
+        model.add(Dense(1, activation='sigmoid'))
+        return model
 
-    def make_generator(self):
+    def __makeGenerator(self):
         print('create generator')
-        self.generator.add(Conv2D(64, (3, 3), padding='same', input_shape=(4, 4, 4)))
-        self.generator.add(UpSampling2D())
-        self.generator.add(Conv2D(128, (3, 3), padding='same'))
-        self.generator.add(BatchNormalization())
-        self.generator.add(ELU())
-        self.generator.add(UpSampling2D())
-        self.generator.add(Conv2D(128, (3, 3), padding='same'))
-        self.generator.add(BatchNormalization())
-        self.generator.add(ELU())
-        self.generator.add(UpSampling2D())
-        self.generator.add(Conv2D(1, (5, 5), padding='same', activation='tanh'))
+        model = Sequential()
+        model.add(Conv2D(64, (3, 3), padding='same', input_shape=(4, 4, 3)))
+        model.add(UpSampling2D())
+        model.add(Conv2D(128, (3, 3), padding='same'))
+        model.add(BatchNormalization())
+        model.add(ELU())
+        model.add(UpSampling2D())
+        model.add(Conv2D(128, (3, 3), padding='same'))
+        model.add(BatchNormalization())
+        model.add(ELU())
+        model.add(UpSampling2D())
+        model.add(Conv2D(3, (5, 5), padding='same', activation='tanh'))
+        return model
 
-    def createImageList(self):
+    def __createImageList(self, dir):
         print('create ImageList')
-        dir = 'ManyData'
         for file in os.listdir(dir):
             filepath = dir + '/' + file
-            image = np.array(Image.open(filepath).resize((160, 160))).astype('float32')
+            image = np.array(Image.open(filepath).resize((64, 64))).astype('float32')
             self.image_list.append(image / 255)
+        l = np.array(self.image_list)
+        np.save('image_list.npy', l)
 
     @staticmethod
     def set_trainable(model, trainable):
@@ -66,23 +71,24 @@ class dcgan:
         for layer in model.layers:
             layer.trainable = trainable
 
-    def compile(self):
+    def __compile(self):
         print('compile the model')
-        self.make_generator()
-        self.make_discriminator()
+        self.generator = self.__makeGenerator()
+        self.discriminator = self.__makeDiscriminator()
         opt_dis = Adam(lr=1e-5, beta_1=0.1)
         self.discriminator.compile(optimizer=opt_dis,
                                    loss='binary_crossentropy',
                                    metrics=['accuracy'])
-        self.discriminator.trainable = False
         self.set_trainable(model=self.discriminator, trainable=False)
         self.dcgan = Sequential([self.generator, self.discriminator])
+        print('set the dcgan')
         opt_gen = Adam(lr=2e-4, beta_1=0.5)
         self.dcgan.compile(optimizer=opt_gen,
                            loss='binary_crossentropy',
                            metrics=['accuracy'])
+        print('compiled')
 
-    def combine(self, generated):
+    def __combine(self, generated):
         print('generated image')
         num = generated.shape[0]
         width = int(math.sqrt(num))
@@ -95,12 +101,13 @@ class dcgan:
             image[i*shape[0]:(i+1)*shape[0], j*shape[1]:(j+1)*shape[1]] = img[:, :, 0]
             return image
 
-    def learn(self):
-
+    def __learn(self):
         def create_random_features(num):
             return np.random.uniform(low=-1, high=1,
-                                     size=[num, 4, 4, 4])
-
+                                     size=[num, 4, 4, 3])
+        print('Load image_list')
+        self.image_list = np.load('image_list.npy')
+        print('Loaded')
         batch_size = 200
         wait = 0
         test_num = 1000
@@ -109,7 +116,8 @@ class dcgan:
         met_curve = np.zeros([0, 4])
         start = time.time()
         loss_g = acc_g = loss_d = acc_d = None
-        self.compile()
+        self.__compile()
+        print('start run')
         for epoch in range(1, sys.maxsize):
             print('epoch : {0}'.format(epoch))
 
@@ -123,7 +131,7 @@ class dcgan:
                 loss_g, acc_g = self.dcgan.train_on_batch(rnd_batch, [0]*len(rnd_batch))
                 generated = self.generator.predict(rnd_batch)
                 if epoch % 20 == 0:
-                    image = self.combine(generated)
+                    image = self.__combine(generated)
                     image = image*127.5 + 127.5
                     dir1 = 'generated/' + str(epoch) + '_' + str(i) + '.png'
                     Image.fromarray(image.astype(np.uint8)).save(dir1)
@@ -158,9 +166,7 @@ class dcgan:
                     wait = 0
 
     def run(self):
-        self.createImageList()
-        self.compile()
-        self.learn()
+        self.__learn()
 
 
 if __name__ == '__main__':
