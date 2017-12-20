@@ -14,7 +14,6 @@ import math
 
 
 class dcgan:
-
     def __init__(self):
         self.discriminator = None
         self.generator = None
